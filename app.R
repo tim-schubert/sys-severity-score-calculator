@@ -851,16 +851,19 @@ ui <- tagList(
 server <- function(input, output, session) {
   counter <- reactiveVal(0)
   mods <- reactiveValues()
+  active_ids <- reactiveVal(character(0))
   selected <- reactiveVal(NA_character_)
   state_cache <- reactiveValues()
   last_selected <- reactiveVal(NULL)
 
   add_individual <- function() {
-    i <- isolate(counter()) + 1
+    i_prev <- isolate(counter())
+    i <- i_prev + 1
     counter(i)
     internal_id <- paste0("ind_", i)
     m <- individualServer(internal_id)
     mods[[internal_id]] <- m
+    active_ids(c(isolate(active_ids()), internal_id))
     internal_id
   }
   
@@ -893,12 +896,13 @@ server <- function(input, output, session) {
   })
   
   dropdown_entries <- reactive({
-    ids <- names(reactiveValuesToList(mods))
+    ids <- active_ids()
     if (!length(ids)) return(list())
-    lapply(ids, function(k) {
+    lapply(seq_along(ids), function(i) {
+      k <- ids[[i]]
       m <- mods[[k]]
       if (is.null(m)) return(NULL)
-      num <- suppressWarnings(as.integer(sub("ind_", "", k)))
+      num <- i
       cached_label <- tryCatch({
         st <- state_cache[[k]]
         if (is.list(st) && nzchar(st$ind_id %||% "")) st$ind_id else ""
@@ -977,13 +981,13 @@ server <- function(input, output, session) {
   }, ignoreInit = TRUE)
   
   output$main_content <- renderUI({
-    ids <- names(reactiveValuesToList(mods))
+    ids <- active_ids()
     if (!length(ids)) {
       return(bslib::card(
         bslib::card_header("Cohort"),
         bslib::card_body(
           tags$p(class = "muted", "No individuals in the cohort."),
-          actionButton("add_ind", "+ Add individual", class = "btn btn-primary")
+          actionButton("add_ind_empty", "+ Add individual", class = "btn btn-primary")
         )
       ))
     }
@@ -1002,7 +1006,7 @@ server <- function(input, output, session) {
   })
 
   observe({
-    ids <- names(reactiveValuesToList(mods))
+    ids <- active_ids()
     if (!length(ids)) return()
     cur <- selected()
     target_id <- if (!is.na(cur) && nzchar(cur) && cur %in% ids) cur else ids[1]
@@ -1061,19 +1065,24 @@ server <- function(input, output, session) {
     selected(new_id)
   }, ignoreInit = TRUE)
   
+  observeEvent(input$add_ind_empty, {
+    new_id <- add_individual()
+    selected(new_id)
+  }, ignoreInit = TRUE)
+  
   observeEvent(input$rm_all, {
-    ids <- names(reactiveValuesToList(mods))
+    ids <- active_ids()
     for (k in ids) mods[[k]] <- NULL
     cache_ids <- names(reactiveValuesToList(state_cache))
     for (k in cache_ids) state_cache[[k]] <- NULL
-    counter(0)
+    active_ids(character(0))
     selected(NA_character_)
     last_selected(NULL)
   }, ignoreInit = TRUE)
   
   
   all_summaries <- reactive({
-    ids <- names(reactiveValuesToList(mods))
+    ids <- active_ids()
     if (!length(ids)) return(list())
     res <- lapply(ids, function(k) {
       m <- mods[[k]]
