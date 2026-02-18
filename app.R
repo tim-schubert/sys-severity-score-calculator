@@ -799,6 +799,17 @@ ui <- tagList(
             width = 3, class = "sidebar",
             downloadButton("dl_summary", "Download summary", class = "btn btn-dark sidebar-download"),
             bslib::card(
+              bslib::card_header("Reference"),
+              bslib::card_body(
+                tags$div(
+                  class = "muted",
+                  style = "font-size:0.9em; margin-bottom:0;",
+                  tags$span("Schubert et al. (2025) · "),
+                  actionLink("show_bib", "BibTeX", class = "bib-link")
+                )
+              )
+            ),
+            bslib::card(
               bslib::card_header("Important Notes"),
               bslib::card_body(
                 tags$p(class = "muted", style = "font-size:0.9em; line-height:1.35; margin-bottom:10px;",
@@ -808,13 +819,63 @@ ui <- tagList(
                 tags$p(class = "muted", style = "font-size:0.9em; line-height:1.35; margin-bottom:10px;",
                        tags$b("Purpose:"), " This score and app are solely designed for research purposes."),
                 tags$p(class = "muted", style = "font-size:0.9em; line-height:1.35; margin-bottom:10px;",
-                       "We are deeply grateful to individuals with SYS and their families for their time, trust, and contributions."),
-                tags$hr(style = "opacity:0.25;"),
+                       "We are deeply grateful to individuals with SYS and their families for their time, trust, and contributions.")
+              )
+            ),
+            bslib::card(
+              bslib::card_header("Collaborators"),
+              bslib::card_body(
                 tags$div(
                   class = "muted",
-                  style = "font-size:0.9em; margin-bottom:8px;",
-                  tags$span("Please cite: Schubert et al. (2025) · "),
-                  actionLink("show_bib", "BibTeX", class = "bib-link")
+                  style = "font-size:0.9em; line-height:1.4; margin-bottom:10px;",
+                  tags$div("Antonia Tietzel", tags$sup("1,2")),
+                  tags$div("Hari Pottayil", tags$sup("1")),
+                  tags$div("Pilar Caro", tags$sup("1")),
+                  tags$div("Rachel B. Gilmore", tags$sup("1")),
+                  tags$div("Felix Franke", tags$sup("1")),
+                  tags$div("Ferdinand Althammer", tags$sup("1")),
+                  tags$div("Christian P. Schaaf", tags$sup("1"))
+                ),
+                tags$div(
+                  class = "muted",
+                  style = "font-size:0.88em; line-height:1.35;",
+                  tags$div(tags$b("Affiliations")),
+                  tags$div(tags$sup("1"), " Institute of Human Genetics, Heidelberg University, Heidelberg, Germany"),
+                  tags$div(tags$sup("2"), " Clinical Cooperation Unit Neuropathology, German Cancer Research Center (DKFZ), Heidelberg, Germany")
+                )
+              )
+            ),
+            bslib::card(
+              bslib::card_header("Software"),
+              bslib::card_body(
+                tags$div(
+                  class = "muted",
+                  style = "font-size:0.9em; line-height:1.4;",
+                  tags$p(
+                    style = "margin-bottom:10px;",
+                    "R version 4.4.2"
+                  ),
+                  tags$p(
+                    style = "margin-bottom:0;",
+                    "Shiny package (version 1.11.1)"
+                  )
+                )
+              )
+            ),
+            bslib::card(
+              bslib::card_header("IT Infrastructure"),
+              bslib::card_body(
+                tags$div(
+                  class = "muted",
+                  style = "font-size:0.9em; line-height:1.4;",
+                  tags$p(
+                    style = "margin-bottom:10px;",
+                    "de.NBI Cloud"
+                  ),
+                  tags$p(
+                    style = "margin-bottom:0;",
+                    "University Computing Centre Heidelberg"
+                  )
                 )
               )
             )
@@ -839,7 +900,13 @@ ui <- tagList(
                tags$span(HTML("&copy; 2026 ")),
                tags$a(href = "https://tim-schubert.github.io", target = "_blank", rel = "noopener noreferrer", "Tim Schubert"),
                tags$span(HTML(" &middot; ")),
-               tags$a(href = "https://www.apache.org/licenses/LICENSE-2.0.html", target = "_blank", "Apache License 2.0")
+               tags$a(href = "https://www.apache.org/licenses/LICENSE-2.0.html", target = "_blank", "Apache License 2.0"),
+               tags$span(HTML(" &middot; ")),
+               tags$a(
+                 href = "#",
+                 "Legal notice (Impressum)",
+                 onclick = "Shiny.setInputValue('open_legal', Date.now(), {priority:'event'}); return false;"
+               )
         )
       ),
       tags$img(src = "https://lh3.googleusercontent.com/d/1BPl641wAs67xCTAKEEETVO0zjzOYUrda", class = "site-footer__logo")
@@ -891,6 +958,64 @@ server <- function(input, output, session) {
           "Copy to clipboard"
         ),
         modalButton("Close")
+      )
+    ))
+  })
+
+  observeEvent(input$open_legal, {
+    showModal(modalDialog(
+      title = "Legal notice (Impressum)",
+      easyClose = TRUE,
+      size = "l",
+      footer = modalButton("Close"),
+      tags$div(
+        style = "line-height:1.45;",
+        tags$h5("Angaben gemäß § 5 TMG", style = "margin-top:0;"),
+        tags$p(
+          "Institut für Humangenetik", tags$br(),
+          "Tim Schubert", tags$br(),
+          "Im Neuenheimer Feld 366, 5. OG", tags$br(),
+          "69120 Heidelberg", tags$br(),
+          "Germany"
+        ),
+        tags$h5("Kontakt"),
+        tags$p("E-Mail: tim dot schubert at med dot uni-heidelberg dot de"),
+        tags$h5("Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV"),
+        tags$p(
+          "Institut für Humangenetik", tags$br(),
+          "Tim Schubert", tags$br(),
+          "Im Neuenheimer Feld 366, 5. OG", tags$br(),
+          "69120 Heidelberg", tags$br(),
+          "Germany"
+        ),
+        tags$h5("Verbraucherstreitbeilegung / Universalschlichtungsstelle"),
+        tags$p(
+          class = "muted",
+          "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+        ),
+        tags$h5("Haftung für Inhalte"),
+        tags$p(
+          class = "muted",
+          "Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+
+Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen."
+        ),
+        tags$h5("Haftung für Links"),
+        tags$p(
+          class = "muted",
+          "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.
+
+Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen."
+        ),
+        tags$h5("Urheberrecht"),
+        tags$p(
+          class = "muted",
+          "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet."
+        ),
+        tags$p(
+          class = "muted",
+          "Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen. Quelle: e-recht24.de"
+        )
       )
     ))
   })
